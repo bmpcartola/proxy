@@ -1,8 +1,3 @@
 {
-  "clubes": {
-    "2305": {
-      "escudos": {
-        "60x60": "https://s3.glbimg.com/v1/AUTH_58d78b787ec34892b5aaa0c7a146155f/clubes_2026/escudos/MIR/60x60.png",
-        "45x45": "https://s3.glbimg.com/v1/AUTH_58d78b787ec34892b5aaa0c7a146155f/clubes_2026/escudos/MIR/45x45.png",
-        "30x30": "https://s3.glbimg.com/v1/AUTH_58d78b787ec34892b5aaa0c7a146155f/clubes_2026/escudos/MIR/30x30.png"
-      },
+  "teste": "ok"
+ }
