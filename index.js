@@ -222,7 +222,14 @@ app.get('/dashboard', (req, res) => {
   });
 });
 
+// ================= PING UPTIMEROBOT =================
+app.get('/', (req, res) => {
+  res.send('Proxy Cartola OK 🚀');
+});
+
 // ================= START =================
 app.listen(PORT, () => {
   console.log(`🚀 API rodando na porta ${PORT}`);
 });
+
+
