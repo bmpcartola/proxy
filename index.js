@@ -8,6 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ================= CONFIG =================
+
 app.use(cors());
 app.use(compression());
 
@@ -17,6 +18,7 @@ const axiosInstance = axios.create({
 });
 
 // ================= CACHE =================
+
 const cache = {
   pontuados: null,
   mercado: null,
@@ -25,9 +27,6 @@ const cache = {
   clubes: null,
   posicoes: null,
 
-  // AWS
-  awsAtletasPontuados: null,
-
   // PROVÁVEIS
   lineups: null,
   mercadoImages: null,
@@ -35,24 +34,23 @@ const cache = {
 };
 
 // ================= TTL =================
+
 const TTL = {
-  pontuados: 10000,      // 10s
-  mercado: 60000,        // 1 min
+  pontuados: 10000,
+  mercado: 60000,
   status: 60000,
   partidas: 60000,
-  clubes: 3600000,       // 1h
+  clubes: 3600000,
   posicoes: 3600000,
 
-  // AWS
-  awsAtletasPontuados: 10000,
-
   // PROVÁVEIS
-  lineups: 300000,       // 5 min
+  lineups: 300000,
   mercadoImages: 300000,
   teamUpdates: 300000
 };
 
 // ================= NORMALIZAÇÃO =================
+
 function normalizarAtleta(id, atleta) {
   return {
     id: Number(id),
@@ -77,8 +75,10 @@ function reduzirPontuados(data) {
 // ================= FETCHERS =================
 
 // 🔥 Pontuados
+
 async function fetchPontuados() {
   try {
+
     const res = await axiosInstance.get(
       'https://api.cartola.globo.com/atletas/pontuados'
     );
@@ -88,13 +88,16 @@ async function fetchPontuados() {
     console.log('🔥 pontuados atualizado');
 
   } catch (e) {
+
     console.log('Erro pontuados:', e.message);
   }
 }
 
 // 🔥 Mercado
+
 async function fetchMercado() {
   try {
+
     const res = await axiosInstance.get(
       'https://api.cartola.globo.com/atletas/mercado'
     );
@@ -104,13 +107,16 @@ async function fetchMercado() {
     console.log('📦 mercado atualizado');
 
   } catch (e) {
+
     console.log('Erro mercado:', e.message);
   }
 }
 
 // 🔥 Status
+
 async function fetchStatus() {
   try {
+
     const res = await axiosInstance.get(
       'https://api.cartola.globo.com/mercado/status'
     );
@@ -120,13 +126,16 @@ async function fetchStatus() {
     console.log('📊 status atualizado');
 
   } catch (e) {
+
     console.log('Erro status:', e.message);
   }
 }
 
 // 🔥 Partidas
+
 async function fetchPartidas() {
   try {
+
     const res = await axiosInstance.get(
       'https://api.cartola.globo.com/partidas'
     );
@@ -136,13 +145,16 @@ async function fetchPartidas() {
     console.log('⚽ partidas atualizadas');
 
   } catch (e) {
+
     console.log('Erro partidas:', e.message);
   }
 }
 
 // 🔥 Clubes
+
 async function fetchClubes() {
   try {
+
     const res = await axiosInstance.get(
       'https://api.cartola.globo.com/clubes'
     );
@@ -152,13 +164,16 @@ async function fetchClubes() {
     console.log('🏆 clubes atualizados');
 
   } catch (e) {
+
     console.log('Erro clubes:', e.message);
   }
 }
 
 // 🔥 Posições
+
 async function fetchPosicoes() {
   try {
+
     const res = await axiosInstance.get(
       'https://api.cartola.globo.com/posicoes'
     );
@@ -168,38 +183,18 @@ async function fetchPosicoes() {
     console.log('📌 posições atualizadas');
 
   } catch (e) {
+
     console.log('Erro posições:', e.message);
-  }
-}
-
-// ================= AWS =================
-
-// 🔥 AWS Atletas Pontuados
-async function fetchAwsAtletasPontuados() {
-  try {
-    const res = await axiosInstance.get(
-      'https://pb89hpsof3.execute-api.us-east-1.amazonaws.com/prod/atletas-pontuados',
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0'
-        }
-      }
-    );
-
-    cache.awsAtletasPontuados = res.data;
-
-    console.log('☁️ AWS atletas-pontuados atualizado');
-
-  } catch (e) {
-    console.log('Erro AWS atletas-pontuados:', e.message);
   }
 }
 
 // ================= PROVÁVEIS =================
 
 // 🔥 Lineups
+
 async function fetchLineups() {
   try {
+
     const res = await axiosInstance.get(
       'https://provaveisdocartola.com.br/assets/data/lineups.json',
       {
@@ -214,13 +209,16 @@ async function fetchLineups() {
     console.log('📋 lineups atualizado');
 
   } catch (e) {
+
     console.log('Erro lineups:', e.message);
   }
 }
 
 // 🔥 Mercado Images
+
 async function fetchMercadoImages() {
   try {
+
     const res = await axiosInstance.get(
       'https://provaveisdocartola.com.br/assets/data/mercado.images.json',
       {
@@ -235,13 +233,16 @@ async function fetchMercadoImages() {
     console.log('🖼 mercado-images atualizado');
 
   } catch (e) {
+
     console.log('Erro mercado-images:', e.message);
   }
 }
 
 // 🔥 Team Updates
+
 async function fetchTeamUpdates() {
   try {
+
     const res = await axiosInstance.get(
       'https://provaveisdocartola.com.br/assets/data/team-updates.json',
       {
@@ -256,6 +257,7 @@ async function fetchTeamUpdates() {
     console.log('📰 team-updates atualizado');
 
   } catch (e) {
+
     console.log('Erro team-updates:', e.message);
   }
 }
@@ -263,6 +265,7 @@ async function fetchTeamUpdates() {
 // ================= SCHEDULER =================
 
 // CARTOLA
+
 setInterval(fetchPontuados, TTL.pontuados);
 setInterval(fetchMercado, TTL.mercado);
 setInterval(fetchStatus, TTL.status);
@@ -270,10 +273,8 @@ setInterval(fetchPartidas, TTL.partidas);
 setInterval(fetchClubes, TTL.clubes);
 setInterval(fetchPosicoes, TTL.posicoes);
 
-// AWS
-setInterval(fetchAwsAtletasPontuados, TTL.awsAtletasPontuados);
-
 // PROVÁVEIS
+
 setInterval(fetchLineups, TTL.lineups);
 setInterval(fetchMercadoImages, TTL.mercadoImages);
 setInterval(fetchTeamUpdates, TTL.teamUpdates);
@@ -281,6 +282,7 @@ setInterval(fetchTeamUpdates, TTL.teamUpdates);
 // ================= PRIMEIRA CARGA =================
 
 // CARTOLA
+
 fetchPontuados();
 fetchMercado();
 fetchStatus();
@@ -288,23 +290,22 @@ fetchPartidas();
 fetchClubes();
 fetchPosicoes();
 
-// AWS
-fetchAwsAtletasPontuados();
-
 // PROVÁVEIS
+
 fetchLineups();
 fetchMercadoImages();
 fetchTeamUpdates();
 
 // ================= ROTAS =================
 
-// 🔥 Pontuados (tempo real + rodada antiga)
+// 🔥 Pontuados
+
 app.get('/atletas/pontuados/:rodada?', async (req, res) => {
+
   const rodada = req.params.rodada;
 
   try {
 
-    // rodada atual
     if (!rodada) {
 
       if (!cache.pontuados) {
@@ -316,7 +317,6 @@ app.get('/atletas/pontuados/:rodada?', async (req, res) => {
       return res.json(cache.pontuados);
     }
 
-    // rodadas antigas
     const response = await axiosInstance.get(
       `https://api.cartola.globo.com/atletas/pontuados/${rodada}`
     );
@@ -333,19 +333,8 @@ app.get('/atletas/pontuados/:rodada?', async (req, res) => {
   }
 });
 
-// 🔥 AWS atletas pontuados
-app.get('/aws/atletas-pontuados', (req, res) => {
-
-  if (!cache.awsAtletasPontuados) {
-    return res.status(503).json({
-      erro: 'Carregando...'
-    });
-  }
-
-  res.json(cache.awsAtletasPontuados);
-});
-
 // 🔥 Mercado
+
 app.get('/mercado', (req, res) => {
 
   if (!cache.mercado) {
@@ -358,6 +347,7 @@ app.get('/mercado', (req, res) => {
 });
 
 // 🔥 Status
+
 app.get('/mercado/status', (req, res) => {
 
   if (!cache.status) {
@@ -370,11 +360,11 @@ app.get('/mercado/status', (req, res) => {
 });
 
 // 🔥 Partidas
+
 app.get('/partidas/:rodada?', async (req, res) => {
 
   const rodada = req.params.rodada;
 
-  // rodada atual
   if (!rodada) {
 
     if (!cache.partidas) {
@@ -386,7 +376,6 @@ app.get('/partidas/:rodada?', async (req, res) => {
     return res.json(cache.partidas);
   }
 
-  // rodada específica
   try {
 
     const response = await axiosInstance.get(
@@ -406,6 +395,7 @@ app.get('/partidas/:rodada?', async (req, res) => {
 });
 
 // 🔥 Clubes
+
 app.get('/clubes', (req, res) => {
 
   if (!cache.clubes) {
@@ -418,6 +408,7 @@ app.get('/clubes', (req, res) => {
 });
 
 // 🔥 Posições
+
 app.get('/posicoes', (req, res) => {
 
   if (!cache.posicoes) {
@@ -430,6 +421,7 @@ app.get('/posicoes', (req, res) => {
 });
 
 // 🔥 Rodadas
+
 app.get('/rodadas', async (req, res) => {
 
   try {
@@ -451,6 +443,7 @@ app.get('/rodadas', async (req, res) => {
 });
 
 // 🔥 Time
+
 app.get('/time/:id', async (req, res) => {
 
   try {
@@ -471,9 +464,60 @@ app.get('/time/:id', async (req, res) => {
   }
 });
 
+// ================= MPV/CEDIDO =================
+
+// 🔥 Rodadas anteriores
+
+app.get('/escalar/rodadas-anteriores/:rodada?', async (req, res) => {
+
+  try {
+
+    const rodada = req.params.rodada || 10;
+
+    const response = await axiosInstance.get(
+      `https://pb89hpsof3.execute-api.us-east-1.amazonaws.com/prod/escalar/rodadas_anteriores/${rodada}`,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0'
+        }
+      }
+    );
+
+    const jogadores = response.data?.jogadores || {};
+
+    const reduzido = {};
+
+    for (const id in jogadores) {
+
+      const atleta = jogadores[id];
+
+      reduzido[id] = {
+        id: atleta.id,
+        nome: atleta.ap,
+        pm: Number(atleta.pm || 0),
+        pc0: Number(atleta.pc0 || 0)
+      };
+    }
+
+    res.json(reduzido);
+
+  } catch (e) {
+
+    console.log(
+      'Erro rodadas anteriores:',
+      e.message
+    );
+
+    res.status(500).json({
+      erro: 'Erro rodadas anteriores'
+    });
+  }
+});
+
 // ================= PROVÁVEIS =================
 
 // 🔥 Lineups
+
 app.get('/provaveis/lineups', (req, res) => {
 
   if (!cache.lineups) {
@@ -486,6 +530,7 @@ app.get('/provaveis/lineups', (req, res) => {
 });
 
 // 🔥 Mercado Images
+
 app.get('/provaveis/mercado-images', (req, res) => {
 
   if (!cache.mercadoImages) {
@@ -498,6 +543,7 @@ app.get('/provaveis/mercado-images', (req, res) => {
 });
 
 // 🔥 Team Updates
+
 app.get('/provaveis/team-updates', (req, res) => {
 
   if (!cache.teamUpdates) {
@@ -520,9 +566,6 @@ app.get('/dashboard', (req, res) => {
     partidas: cache.partidas,
     clubes: cache.clubes,
     posicoes: cache.posicoes,
-
-    // AWS
-    awsAtletasPontuados: cache.awsAtletasPontuados,
 
     // PROVÁVEIS
     lineups: cache.lineups,
