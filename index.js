@@ -472,7 +472,7 @@ app.get('/escalar/rodadas-anteriores', async (req, res) => {
   try {
 
     const response = await axiosInstance.get(
-      'https://pb89hpsof3.execute-api.us-east-1.amazonaws.com/prod/escalar/rodadas_anteriores',
+      'https://pb89hpsof3.execute-api.us-east-1.amazonaws.com/prod/escalar/rodadas_anteriores/10',
       {
         headers: {
           'User-Agent': 'Mozilla/5.0'
