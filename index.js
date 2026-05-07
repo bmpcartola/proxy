@@ -466,16 +466,13 @@ app.get('/time/:id', async (req, res) => {
 
 // ================= MPV/CEDIDO =================
 
-// 🔥 Rodadas anteriores
-
-app.get('/escalar/rodadas-anteriores/:rodada?', async (req, res) => {
+// 🔥 Rodadas anteriores (FIXO)
+app.get('/escalar/rodadas-anteriores', async (req, res) => {
 
   try {
 
-    const rodada = req.params.rodada || 10;
-
     const response = await axiosInstance.get(
-      `https://pb89hpsof3.execute-api.us-east-1.amazonaws.com/prod/escalar/rodadas_anteriores/${rodada}`,
+      'https://pb89hpsof3.execute-api.us-east-1.amazonaws.com/prod/escalar/rodadas_anteriores',
       {
         headers: {
           'User-Agent': 'Mozilla/5.0'
@@ -494,7 +491,11 @@ app.get('/escalar/rodadas-anteriores/:rodada?', async (req, res) => {
       reduzido[id] = {
         id: atleta.id,
         nome: atleta.ap,
+
+        // MPV
         pm: Number(atleta.pm || 0),
+
+        // CEDIDO
         pc0: Number(atleta.pc0 || 0)
       };
     }
@@ -503,10 +504,7 @@ app.get('/escalar/rodadas-anteriores/:rodada?', async (req, res) => {
 
   } catch (e) {
 
-    console.log(
-      'Erro rodadas anteriores:',
-      e.message
-    );
+    console.log('Erro rodadas anteriores:', e.message);
 
     res.status(500).json({
       erro: 'Erro rodadas anteriores'
