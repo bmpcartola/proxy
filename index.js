@@ -25,6 +25,9 @@ const cache = {
   clubes: null,
   posicoes: null,
 
+  // AWS
+  awsAtletasPontuados: null,
+
   // PROVÁVEIS
   lineups: null,
   mercadoImages: null,
@@ -39,6 +42,9 @@ const TTL = {
   partidas: 60000,
   clubes: 3600000,       // 1h
   posicoes: 3600000,
+
+  // AWS
+  awsAtletasPontuados: 10000,
 
   // PROVÁVEIS
   lineups: 300000,       // 5 min
@@ -166,6 +172,29 @@ async function fetchPosicoes() {
   }
 }
 
+// ================= AWS =================
+
+// 🔥 AWS Atletas Pontuados
+async function fetchAwsAtletasPontuados() {
+  try {
+    const res = await axiosInstance.get(
+      'https://pb89hpsof3.execute-api.us-east-1.amazonaws.com/prod/atletas-pontuados',
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0'
+        }
+      }
+    );
+
+    cache.awsAtletasPontuados = res.data;
+
+    console.log('☁️ AWS atletas-pontuados atualizado');
+
+  } catch (e) {
+    console.log('Erro AWS atletas-pontuados:', e.message);
+  }
+}
+
 // ================= PROVÁVEIS =================
 
 // 🔥 Lineups
@@ -241,6 +270,9 @@ setInterval(fetchPartidas, TTL.partidas);
 setInterval(fetchClubes, TTL.clubes);
 setInterval(fetchPosicoes, TTL.posicoes);
 
+// AWS
+setInterval(fetchAwsAtletasPontuados, TTL.awsAtletasPontuados);
+
 // PROVÁVEIS
 setInterval(fetchLineups, TTL.lineups);
 setInterval(fetchMercadoImages, TTL.mercadoImages);
@@ -255,6 +287,9 @@ fetchStatus();
 fetchPartidas();
 fetchClubes();
 fetchPosicoes();
+
+// AWS
+fetchAwsAtletasPontuados();
 
 // PROVÁVEIS
 fetchLineups();
@@ -296,6 +331,18 @@ app.get('/atletas/pontuados/:rodada?', async (req, res) => {
       erro: 'Erro pontuados'
     });
   }
+});
+
+// 🔥 AWS atletas pontuados
+app.get('/aws/atletas-pontuados', (req, res) => {
+
+  if (!cache.awsAtletasPontuados) {
+    return res.status(503).json({
+      erro: 'Carregando...'
+    });
+  }
+
+  res.json(cache.awsAtletasPontuados);
 });
 
 // 🔥 Mercado
@@ -473,6 +520,9 @@ app.get('/dashboard', (req, res) => {
     partidas: cache.partidas,
     clubes: cache.clubes,
     posicoes: cache.posicoes,
+
+    // AWS
+    awsAtletasPontuados: cache.awsAtletasPontuados,
 
     // PROVÁVEIS
     lineups: cache.lineups,
