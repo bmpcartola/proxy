@@ -30,7 +30,10 @@ const cache = {
   // PROVÁVEIS
   lineups: null,
   mercadoImages: null,
-  teamUpdates: null
+  teamUpdates: null,
+
+  // SEARCH
+  search: null
 };
 
 // ================= TTL =================
@@ -46,7 +49,10 @@ const TTL = {
   // PROVÁVEIS
   lineups: 300000,
   mercadoImages: 300000,
-  teamUpdates: 300000
+  teamUpdates: 300000,
+
+  // SEARCH
+  search: 300000
 };
 
 // ================= NORMALIZAÇÃO =================
@@ -262,6 +268,27 @@ async function fetchTeamUpdates() {
   }
 }
 
+// ================= SEARCH =================
+
+// 🔥 Busca jogadores
+
+async function fetchSearch() {
+  try {
+
+    const res = await axiosInstance.get(
+      'https://api.cartola.globo.com/atletas/mercado'
+    );
+
+    cache.search = res.data;
+
+    console.log('🔎 search atualizado');
+
+  } catch (e) {
+
+    console.log('Erro search:', e.message);
+  }
+}
+
 // ================= SCHEDULER =================
 
 // CARTOLA
@@ -279,6 +306,10 @@ setInterval(fetchLineups, TTL.lineups);
 setInterval(fetchMercadoImages, TTL.mercadoImages);
 setInterval(fetchTeamUpdates, TTL.teamUpdates);
 
+// SEARCH
+
+setInterval(fetchSearch, TTL.search);
+
 // ================= PRIMEIRA CARGA =================
 
 // CARTOLA
@@ -295,6 +326,10 @@ fetchPosicoes();
 fetchLineups();
 fetchMercadoImages();
 fetchTeamUpdates();
+
+// SEARCH
+
+fetchSearch();
 
 // ================= ROTAS =================
 
@@ -467,6 +502,7 @@ app.get('/time/:id', async (req, res) => {
 // ================= MPV/CEDIDO =================
 
 // 🔥 Rodadas anteriores (FIXO)
+
 app.get('/escalar/rodadas-anteriores', async (req, res) => {
 
   try {
@@ -553,6 +589,46 @@ app.get('/provaveis/team-updates', (req, res) => {
   res.json(cache.teamUpdates);
 });
 
+// ================= SEARCH =================
+
+// 🔥 Buscar atleta por nome
+
+app.get('/search/:nome', (req, res) => {
+
+  if (!cache.search || !cache.search.atletas) {
+    return res.status(503).json({
+      erro: 'Carregando...'
+    });
+  }
+
+  const nomeBusca = req.params.nome
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  const atletas = cache.search.atletas;
+
+  const resultado = atletas.filter(atleta => {
+
+    const nome = (atleta.nome || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    const apelido = (atleta.apelido || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    return (
+      nome.includes(nomeBusca) ||
+      apelido.includes(nomeBusca)
+    );
+  });
+
+  res.json(resultado);
+});
+
 // ================= DASHBOARD =================
 
 app.get('/dashboard', (req, res) => {
@@ -568,7 +644,10 @@ app.get('/dashboard', (req, res) => {
     // PROVÁVEIS
     lineups: cache.lineups,
     mercadoImages: cache.mercadoImages,
-    teamUpdates: cache.teamUpdates
+    teamUpdates: cache.teamUpdates,
+
+    // SEARCH
+    search: cache.search
   });
 });
 
